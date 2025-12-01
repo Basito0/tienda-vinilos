@@ -1,0 +1,76 @@
+<html>
+    <body>
+        <h1>AQUÍ SE VEN LOS PRECIOS</h1>
+        <div>
+            <p>Producto 1</p>
+            <p id="precio1">null</p>
+            <a>Stock: </a>
+            <a id="stock"></a>
+        </div>
+        <button type="button" onclick="BuyProduct()">Comprar</button>
+    </body>
+</html>
+
+<script>
+    fetch('http://192.168.56.1:8000/stock')
+        .then(response => {
+            // Check if the request was successful (status code 2xx)
+            if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Parse the JSON response into a JavaScript object
+            return response.json();
+        })
+        .then(data => {
+            const elem = document.getElementById("stock");
+            elem.textContent = data.cantidad.join(", ");
+        })
+        .catch(error => {
+            // Handle any errors that occurred during the fetch operation
+            console.error('Fetch error:', error);
+        });
+    fetch('http://192.168.56.1:8000/precios')
+        .then(response => {
+            // Check if the request was successful (status code 2xx)
+            if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Parse the JSON response into a JavaScript object
+            return response.json();
+        })
+        .then(data => {
+            const elem = document.getElementById("precio1");
+            elem.textContent = data.precios.join(", ");
+        })
+        .catch(error => {
+            // Handle any errors that occurred during the fetch operation
+            console.error('Fetch error:', error);
+        });
+    
+    function BuyProduct() {
+        fetch('http://192.168.56.1:8000/comprar')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // si tu backend devuelve JSON
+            })
+            .then(data => {
+                console.log("Compra realizada:", data);
+                return fetch('http://192.168.56.1:8000/stock');
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const elem = document.getElementById("stock");
+                elem.textContent = data.cantidad.join(", ");
+            })
+            .catch(error => {
+                console.error('Error en compra o actualización de stock:', error);
+            });
+    }
+</script>

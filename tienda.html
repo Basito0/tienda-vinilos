@@ -6,8 +6,16 @@
 </html>
 
 <script>
+    // Cambia esta variable para apuntar a otro backend fácilmente
+    const API_BASE = 'http://192.168.1.150:8000'; // red local
+    //const API_BASE = 'http://192.168.99.55:8000'; // red movil
 
-    fetch('http://192.168.56.1:8000/productos/random')
+    function apiUrl(path) {
+        return `${API_BASE}${path}`;
+    }
+
+    // Carga inicial de productos
+    fetch(apiUrl('/productos/random'))
     .then(response => response.json())
     .then(data => {
         const container = document.getElementById("productos");
@@ -27,7 +35,7 @@
     .catch(error => console.error("Error al cargar productos:", error));
 
     function loadProductos() {
-        fetch('http://192.168.56.1:8000/productos/random')
+        fetch(apiUrl('/productos/random'))
         .then(res => res.json())
         .then(data => {
         const container = document.getElementById("productos");
@@ -48,14 +56,14 @@
     }
 
     function comprar(id) {
-        fetch(`http://192.168.56.1:8000/comprar?producto_id=${id}`)
+        fetch(apiUrl(`/comprar?producto_id=${id}`))
             .then(res => {
                 if (!res.ok) throw new Error("Compra fallida");
                 return res.json();
             })
             .then(data => {
                 console.log(data.status);
-                return fetch(`http://192.168.56.1:8000/stock?producto_id=${id}`);
+                return fetch(apiUrl(`/stock?producto_id=${id}`));
             })
             .then(res => res.json())
             .then(data => {

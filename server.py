@@ -9,18 +9,21 @@ app = FastAPI()
 
 def get_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Contraseña302;",
+        host="192.168.1.142",
+        port=3306,
+        user="apiuser001",
+        password="123456789",
         database="tienda"
+
     )
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:8081",
-    "http://192.168.56.1:8081",
-    
+    "http://192.168.1.151",
+    "http://192.168.1.151:8080",
+    "http://192.168.1.151:8081",
+    "http://192.168.99.139",
+    "http://192.168.99.139:8080",
+    "http://192.168.99.139:8081",
 ]
 
 app.add_middleware(
@@ -39,7 +42,7 @@ def get_precios():
         conn = get_connection()
         mycursor = conn.cursor()
 
-        mycursor.execute("SELECT Precio FROM productos WHERE ProductoID = 1")
+        mycursor.execute("SELECT Precio FROM Productos WHERE ProductoID = 1")
 
         myresult = mycursor.fetchall()
 
@@ -53,11 +56,12 @@ def get_precios():
 def buy_disc(producto_id: int = Query(...)):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT Cantidad FROM productos WHERE ProductoID = %s", (producto_id,))
+    cursor.execute("SELECT Cantidad FROM Productos WHERE ProductoID = %s", (producto_id,))
     cantidad = cursor.fetchone()[0]
 
     if cantidad > 0:
-        cursor.execute("UPDATE productos SET Cantidad = Cantidad - 1 WHERE ProductoID = %s", (producto_id,))
+        cursor.execute("UPDATE Productos SET Cantidad = Cantidad - 1 WHERE ProductoID = %s", (producto_id,))
+        cursor.execute("INSERT INTO RegistroCompra (ProductoID, CantidadComprada) VALUES (%s, %s)", (producto_id, 1))
         conn.commit()
         conn.close()
         return JSONResponse(content={"status": "Compra realizada"})
@@ -74,7 +78,7 @@ def get_stock(producto_id: int = Query(...)):
 
         mycursor = conn.cursor()
 
-        mycursor.execute("SELECT Cantidad FROM productos WHERE ProductoID = %s", (producto_id,))
+        mycursor.execute("SELECT Cantidad FROM Productos WHERE ProductoID = %s", (producto_id,))
 
         myresult = mycursor.fetchall()
 
@@ -95,3 +99,4 @@ def get_random_products():
     # Pick 3 random products (or fewer if not enough)
     sample = random.sample(all_products, min(3, len(all_products)))
     return JSONResponse(content={"productos": sample})
+

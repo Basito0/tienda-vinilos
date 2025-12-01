@@ -1,76 +1,209 @@
-<html>
-    <div class="product-list">
-        <div id="productos"></div>
-    </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinilo Vintage Store</title>
+  <style>
+    :root {
+      --primary: #e97451;   /* Burnt Sienna */
+      --secondary: #fdf6e3; /* Linen Beige */
+      --text: #4b3f2f;      /* Charcoal Brown */
+      --accent: #c75c3f;    /* Deep Clay */
+    }
 
-</html>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Georgia', serif;
+      background-color: var(--secondary);
+      color: var(--text);
+    }
 
-<script>
+    header {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
 
-    fetch('http://192.168.56.1:8000/productos/random')
-    .then(response => response.json())
-    .then(data => {
-        const container = document.getElementById("productos");
-        container.innerHTML = ""; // clear previous content
-        data.productos.forEach(p => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-            <h3>${p.Nombre}</h3>
-            <p>${p.Descripcion}</p>
-            <p>Precio: $${p.Precio}</p>
-            <p>Stock: ${p.Cantidad}</p>
-            <hr/>
-        `;
-        container.appendChild(div);
-        });
-    })
-    .catch(error => console.error("Error al cargar productos:", error));
+    header h1 {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+    }
 
+    nav a {
+      color: #fff;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background-image: url("https://media.vogue.es/photos/5cc76a54f3fa8cb9db7a7d98/master/w_120,c_limit/las_mejores_tiendas_de_discos_del_mundo_3418.jpghttps://img.redbull.com/images/c_crop,x_2639,y_0,h_3839,w_2304/c_fill,w_450,h_600/q_auto,f_auto/redbullcom/2017/04/06/1331852808095_2/discos-de-vinilo-");
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(75, 63, 47, 0.6); /* warm overlay */
+    }
+
+    .hero h2, .hero p {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+    }
+
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .product-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(75,63,47,0.1);
+      padding: 1rem;
+      transition: transform 0.3s ease;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .product-card h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    .product-card p {
+      margin: 0.5rem 0;
+    }
+
+    .product-card button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .product-card button:hover {
+      background-color: var(--accent);
+    }
+
+    footer {
+      background-color: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vinilo Vintage 🎶</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Colección</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Bienvenido a tu tienda de vinilos</h2>
+      <p>Descubre discos clásicos y rarezas que nunca pasan de moda.</p>
+    </section>
+
+    <div class="product-list" id="productos"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Vinilo Vintage Store. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
     function loadProductos() {
-        fetch('http://192.168.56.1:8000/productos/random')
+      fetch('http://192.168.56.1:8000/productos/random')
         .then(res => res.json())
         .then(data => {
-        const container = document.getElementById("productos");
-        container.innerHTML = "";
-        data.productos.forEach(p => {
+          const container = document.getElementById("productos");
+          container.innerHTML = "";
+          data.productos.forEach(p => {
             const div = document.createElement("div");
+            div.className = "product-card";
             div.innerHTML = `
-            <h3>${p.Nombre}</h3>
-            <p>${p.Descripcion}</p>
-            <p>Precio: $${p.Precio}</p>
-            <p id="stock-${p.ProductoID}">Stock: ${p.Cantidad}</p>
-            <button onclick="comprar(${p.ProductoID})">Comprar</button>
-            <hr/>
+              <img src="https://wololosound.com/wp-content/uploads/Formas-de-limpiar-discos-de-vinilo-antiguos.jpg" alt="${p.Nombre}">
+              <h3>${p.Nombre}</h3>
+              <p>${p.Descripcion}</p>
+              <p><strong>Precio:</strong> $${p.Precio}</p>
+              <p id="stock-${p.ProductoID}"><strong>Stock:</strong> ${p.Cantidad}</p>
+              <button onclick="comprar(${p.ProductoID})">Comprar</button>
             `;
             container.appendChild(div);
-        });
-        });
+          });
+        })
+        .catch(error => console.error("Error al cargar productos:", error));
     }
 
     function comprar(id) {
-        fetch(`http://192.168.56.1:8000/comprar?producto_id=${id}`)
-            .then(res => {
-                if (!res.ok) throw new Error("Compra fallida");
-                return res.json();
-            })
-            .then(data => {
-                console.log(data.status);
-                return fetch(`http://192.168.56.1:8000/stock?producto_id=${id}`);
-            })
-            .then(res => res.json())
-            .then(data => {
-                const stockElem = document.getElementById(`stock-${id}`);
-                stockElem.textContent = `Stock: ${data.cantidad[0]}`;
-            })
-            .catch(err => console.error("Error:", err));
+      fetch(`http://192.168.56.1:8000/comprar?producto_id=${id}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Compra fallida");
+          return res.json();
+        })
+        .then(() => fetch(`http://192.168.56.1:8000/stock?producto_id=${id}`))
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById(`stock-${id}`).textContent = `Stock: ${data.cantidad[0]}`;
+        })
+        .catch(err => console.error("Error:", err));
     }
 
     window.onload = loadProductos;
-
-</script>
-
-<style>
-    .product-list {
-        margin: 3rem;
-    }
-</style>
+  </script>
+</body>
+</html>
